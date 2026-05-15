@@ -82,7 +82,7 @@
             <header class="bg-white border-b border-stone-200">
                 <div class="px-6 h-14 flex items-center justify-between">
                     <span class="text-[15px] font-medium text-stone-700">Units converter</span>
-                    <button
+                    <button onclick="toggleHistory()"
                         class="text-[13px] text-stone-400 flex items-center gap-1.5 hover:text-stone-600 transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -96,7 +96,19 @@
                 </div>
             </header>
 
-            <!-- tab bar -->
+            <!-- history drawer -->
+            <div id="history-drawer" class="hidden border-b border-stone-200 bg-white">
+                <div class="px-6 py-4 flex items-center justify-between">
+                    <span class="text-[13px] font-medium text-stone-600">Recent conversions</span>
+                    <button onclick="clearHistory()"
+                        class="text-[12px] text-stone-400 hover:text-red-500 transition-colors">Clear all</button>
+                </div>
+                <div id="history-list" class="px-6 pb-4 space-y-2 max-h-56 overflow-y-auto">
+                    <!-- entries injected by js -->
+                </div>
+                <div id="history-empty" class="px-6 pb-5 text-[13px] text-stone-400 text-center hidden">No conversions
+                    yet</div>
+            </div>
             <div class="bg-white border-b border-stone-200 flex items-center">
                 <button id="tab-prev" onclick="scrollTabs(-1)"
                     class="flex-shrink-0 w-9 h-11 flex items-center justify-center text-stone-400 hover:text-stone-600 hover:bg-stone-50 transition-colors border-r border-stone-100 disabled:opacity-25"
@@ -638,7 +650,7 @@
                     </div>
                 </div>
 
-                <!-- speed -->
+                <!-- SPEED -->
                 <div id="section-speed" class="section space-y-5">
                     <p class="text-[11px] font-medium text-stone-400 tracking-widest uppercase">Speed</p>
                     <div class="bg-white rounded-2xl border border-stone-200 p-6 space-y-5">
@@ -935,7 +947,7 @@
             energy: { j: 'J', kj: 'kJ', cal: 'cal', kcal: 'kcal', kwh: 'kWh', btu: 'BTU', ev: 'eV' },
         };
 
-        // format result
+        // results
         function formatResult(n) {
             if (!isFinite(n)) return 'Error';
             if (n === 0) return '0';
@@ -945,7 +957,7 @@
             return parseFloat(n.toPrecision(8)).toString();
         }
 
-        // temperature special calculation
+        // temoerature formula
         function convertTemp(value, from, to) {
             if (from === to) return value;
             let celsius;
@@ -961,7 +973,7 @@
             }
         }
 
-        // ─formula strings
+        // formula strings
         function getFormula(category, from, to, value, result) {
             const fl = labels[category] ? labels[category][from] : from;
             const tl = labels[category] ? labels[category][to] : to;
@@ -982,7 +994,77 @@
             return `${fl} ÷ ${parseFloat((1 / ratio).toPrecision(6))} = ${tl}`;
         }
 
-        // convert function
+        // history: localStorage key and max entries
+        const HISTORY_KEY = 'uc_history';
+        const MAX_HISTORY = 30;
+
+        // load history array from localStorage
+        function loadHistory() {
+            try { return JSON.parse(localStorage.getItem(HISTORY_KEY)) || []; }
+            catch { return []; }
+        }
+
+        // save history array to localStorage
+        function saveHistory(entries) {
+            localStorage.setItem(HISTORY_KEY, JSON.stringify(entries));
+        }
+
+        // push a new conversion entry (newest first, capped at max)
+        function pushHistory(entry) {
+            const entries = loadHistory();
+            entries.unshift(entry);
+            if (entries.length > MAX_HISTORY) entries.length = MAX_HISTORY;
+            saveHistory(entries);
+        }
+
+        // render history entries into the drawer
+        function renderHistory() {
+            const entries = loadHistory();
+            const list = document.getElementById('history-list');
+            const empty = document.getElementById('history-empty');
+            list.innerHTML = '';
+            if (entries.length === 0) {
+                empty.classList.remove('hidden');
+                return;
+            }
+            empty.classList.add('hidden');
+            entries.forEach(e => {
+                const row = document.createElement('div');
+                row.className = 'flex items-center justify-between bg-stone-50 border border-stone-100 rounded-lg px-4 py-2.5 gap-4';
+                row.innerHTML = `
+          <div class="flex items-center gap-2 text-[13px] text-stone-700 min-w-0">
+            <span class="font-medium truncate">${e.input} ${e.fromLabel}</span>
+            <span class="text-stone-300">→</span>
+            <span class="font-medium truncate">${e.result} ${e.toLabel}</span>
+          </div>
+          <div class="flex items-center gap-3 flex-shrink-0">
+            <span class="text-[11px] text-stone-400 uppercase tracking-wide">${e.category}</span>
+            <span class="text-[11px] text-stone-300">${e.time}</span>
+          </div>`;
+                list.appendChild(row);
+            });
+        }
+
+        // toggle drawer open/closed
+        function toggleHistory() {
+            const drawer = document.getElementById('history-drawer');
+            const isHidden = drawer.classList.toggle('hidden');
+            if (!isHidden) renderHistory();
+        }
+
+        // clear all history from storage and re-render
+        function clearHistory() {
+            localStorage.removeItem(HISTORY_KEY);
+            renderHistory();
+        }
+
+        // format a timestamp as "hh:mm"
+        function formatTime(ts) {
+            const d = new Date(ts);
+            return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
+        // main convert function
         function convert(category) {
             const value = parseFloat(document.getElementById(category + '-input').value);
             const from = document.getElementById(category + '-from').value;
@@ -1000,8 +1082,23 @@
                 result = toBase / rates[category][to];
             }
 
-            resultEl.textContent = formatResult(result);
+            const formatted = formatResult(result);
+            resultEl.textContent = formatted;
             formulaEl.textContent = getFormula(category, from, to, value, result);
+
+            // save to history
+            pushHistory({
+                category,
+                input: value,
+                fromLabel: labels[category] ? labels[category][from] : from,
+                result: formatted,
+                toLabel: labels[category] ? labels[category][to] : to,
+                time: formatTime(Date.now()),
+            });
+
+            // refresh drawer if it's open
+            const drawer = document.getElementById('history-drawer');
+            if (!drawer.classList.contains('hidden')) renderHistory();
         }
     </script>
 </body>
