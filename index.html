@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Units Converter</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap"
+        rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['DM Sans', 'sans-serif'],
+                        mono: ['DM Mono', 'monospace'],
+                    },
+                    colors: {
+                        stone: {
+                            50: '#f5f4f0',
+                            100: '#e8e6e0',
+                            200: '#d3d1c7',
+                            300: '#b4b2a9',
+                            400: '#888780',
+                            500: '#5f5e5a',
+                            600: '#444441',
+                            700: '#2c2c2a',
+                        },
+                        blue: {
+                            50: '#e6f1fb',
+                            100: '#b5d4f4',
+                            200: '#85b7eb',
+                            400: '#378add',
+                            600: '#185fa5',
+                            800: '#0c447c',
+                        },
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .tab-active {
+            border-bottom: 2px solid #2c2c2a;
+            color: #2c2c2a;
+            font-weight: 500;
+        }
+
+        .tab-inactive {
+            border-bottom: 2px solid transparent;
+            color: #888780;
+        }
+
+        .tab-inactive:hover {
+            color: #444441;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen text-stone-700" style="background-color:#dddbd3">
+
+    <div class="min-h-screen py-10 px-4 flex justify-center items-start">
+        <div class="w-full max-w-2xl bg-stone-50 rounded-2xl overflow-hidden border border-stone-200">
+
+            <!-- navbar -->
+            <header class="bg-white border-b border-stone-200">
+                <div class="px-6 h-14 flex items-center justify-between">
+                    <span class="text-[15px] font-medium text-stone-700">Units converter</span>
+                    <button
+                        class="text-[13px] text-stone-400 flex items-center gap-1.5 hover:text-stone-600 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 3h18v4H3z" />
+                            <path d="M5 7v13" />
+                            <path d="M19 7v13" />
+                            <path d="M9 12h6" />
+                        </svg>
+                        History
+                    </button>
+                </div>
+            </header>
+
+            <!-- tab bar -->
+            <div class="bg-white border-b border-stone-200 flex items-center">
+                <button id="tab-prev" onclick="scrollTabs(-1)"
+                    class="flex-shrink-0 w-9 h-11 flex items-center justify-center text-stone-400 hover:text-stone-600 hover:bg-stone-50 transition-colors border-r border-stone-100 disabled:opacity-25"
+                    aria-label="Scroll tabs left">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M15 18l-6-6 6-6" />
+                    </svg>
+                </button>
+                <div id="tab-scroll" class="flex-1 overflow-x-auto flex"
+                    style="scrollbar-width:none;-ms-overflow-style:none;">
+                    <style>
+                        #tab-scroll::-webkit-scrollbar {
+                            display: none
+                        }
+                    </style>
+                    <button onclick="switchTab('length')" id="tab-length"
+                        class="tab-active   tab px-4 h-11 text-[13px] whitespace-nowrap transition-colors">Length</button>
+                    <button onclick="switchTab('mass')" id="tab-mass"
+                        class="tab-inactive tab px-4 h-11 text-[13px] whitespace-nowrap transition-colors">Mass</button>
+                    <button onclick="switchTab('volume')" id="tab-volume"
+                        class="tab-inactive tab px-4 h-11 text-[13px] whitespace-nowrap transition-colors">Volume</button>
+                    <button onclick="switchTab('temp')" id="tab-temp"
+                        class="tab-inactive tab px-4 h-11 text-[13px] whitespace-nowrap transition-colors">Temperature</button>
+                    <button onclick="switchTab('time')" id="tab-time"
+                        class="tab-inactive tab px-4 h-11 text-[13px] whitespace-nowrap transition-colors">Time</button>
+                    <button onclick="switchTab('area')" id="tab-area"
+                        class="tab-inactive tab px-4 h-11 text-[13px] whitespace-nowrap transition-colors">Area</button>
+                    <button onclick="switchTab('speed')" id="tab-speed"
+                        class="tab-inactive tab px-4 h-11 text-[13px] whitespace-nowrap transition-colors">Speed</button>
+                    <button onclick="switchTab('data')" id="tab-data"
+                        class="tab-inactive tab px-4 h-11 text-[13px] whitespace-nowrap transition-colors">Data
+                        storage</button>
+                    <button onclick="switchTab('energy')" id="tab-energy"
+                        class="tab-inactive tab px-4 h-11 text-[13px] whitespace-nowrap transition-colors">Energy</button>
+                </div>
+                <button id="tab-next" onclick="scrollTabs(1)"
+                    class="flex-shrink-0 w-9 h-11 flex items-center justify-center text-stone-400 hover:text-stone-600 hover:bg-stone-50 transition-colors border-l border-stone-100"
+                    aria-label="Scroll tabs right">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 18l6-6-6-6" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- main -->
+            <main class="px-6 py-8">
+
+                <!-- length -->
+                <div id="section-length" class="section active space-y-5">
+                    <p class="text-[11px] font-medium text-stone-400 tracking-widest uppercase">Length</p>
+                    <div class="bg-white rounded-2xl border border-stone-200 p-6 space-y-5">
+                        <div class="flex items-end gap-4">
+                            <!-- From -->
+                            <div class="flex-1 space-y-2">
+                                <label class="text-[12px] text-stone-400">From</label>
+                                <select id="length-from"
+                                    class="w-full bg-stone-50 border border-stone-200 rounded-lg px-3 py-2.5 text-[14px] font-medium text-stone-700 focus:outline-none focus:border-stone-400">
+                                    <option value="km">Kilometre (km)</option>
+                                    <option value="m">Metre (m)</option>
+                                    <option value="cm" selected>Centimetre (cm)</option>
+                                    <option value="mm">Millimetre (mm)</option>
+                                    <option value="mi">Mile (mi)</option>
+                                    <option value="yd">Yard (yd)</option>
+                                    <option value="ft">Foot (ft)</option>
+                                    <option value="in">Inch (in)</option>
+                                    <option value="nmi">Nautical mile (nmi)</option>
+                                </select>
+                                <input id="length-input" type="number" placeholder="Enter value" value="100"
+                                    class="w-full bg-stone-50 border border-stone-200 rounded-lg px-3 py-2.5 text-[22px] font-medium text-stone-700 focus:outline-none focus:border-stone-400" />
+                            </div>
+                            <!-- Swap -->
+                            <button onclick="swapUnits('length')"
+                                class="mb-2.5 w-10 h-10 rounded-full bg-stone-50 border border-stone-200 flex items-center justify-center text-stone-500 hover:bg-stone-100 transition-colors flex-shrink-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path d="M21 16H3m18 0-4 4m4-4-4-4M3 8h18M3 8l4 4M3 8l4-4" />
+                                </svg>
+                            </button>
+                            <!-- To -->
+                            <div class="flex-1 space-y-2">
+                                <label class="text-[12px] text-stone-400">To</label>
+                                <select id="length-to"
+                                    class="w-full bg-stone-50 border border-stone-200 rounded-lg px-3 py-2.5 text-[14px] font-medium text-stone-700 focus:outline-none focus:border-stone-400">
+                                    <option value="km">Kilometre (km)</option>
+                                    <option value="m" selected>Metre (m)</option>
+                                    <option value="cm">Centimetre (cm)</option>
+                                    <option value="mm">Millimetre (mm)</option>
+                                    <option value="mi">Mile (mi)</option>
+                                    <option value="yd">Yard (yd)</option>
+                                    <option value="ft">Foot (ft)</option>
+                                    <option value="in">Inch (in)</option>
+                                    <option value="nmi">Nautical mile (nmi)</option>
+                                </select>
+                                <div id="length-result"
+                                    class="w-full bg-blue-50 border border-blue-100 rounded-lg px-3 py-2.5 text-[22px] font-medium text-blue-600 min-h-[50px]">
+                                    —</div>
+                            </div>
+                        </div>
+                        <!-- Formula -->
+                        <div class="bg-stone-50 rounded-lg px-4 py-3 flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                                stroke-linejoin="round" class="text-stone-400 flex-shrink-0">
+                                <path d="M3 6h18M3 12h18M3 18h18" />
+                            </svg>
+                            <span class="text-[12px] text-stone-400">Formula: </span>
+                            <span id="length-formula" class="text-[12px] font-mono text-stone-600">cm ÷ 100 = m</span>
+                        </div>
+                        <button onclick="convert('length')"
+                            class="w-full bg-stone-700 hover:bg-stone-600 text-white rounded-xl py-3.5 text-[15px] font-medium transition-colors">
+                            Convert
+                        </button>
+                    </div>
+                    <!-- Quick conversions -->
+                    <div class="space-y-2">
+                        <p class="text-[11px] font-medium text-stone-400 tracking-widest uppercase">Quick conversions
+                        </p>
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="setQuick('length','km','mi')"
+                                class="bg-white border border-stone-200 rounded-full px-4 py-1.5 text-[12px] text-stone-500 hover:border-stone-300 hover:text-stone-700 transition-colors">km
+                                → mile</button>
+                            <button onclick="setQuick('length','in','cm')"
+                                class="bg-white border border-stone-200 rounded-full px-4 py-1.5 text-[12px] text-stone-500 hover:border-stone-300 hover:text-stone-700 transition-colors">inch
+                                → cm</button>
+                            <button onclick="setQuick('length','ft','m')"
+                                class="bg-white border border-stone-200 rounded-full px-4 py-1.5 text-[12px] text-stone-500 hover:border-stone-300 hover:text-stone-700 transition-colors">foot
+                                → m</button>
+                            <button onclick="setQuick('length','yd','m')"
+                                class="bg-white border border-stone-200 rounded-full px-4 py-1.5 text-[12px] text-stone-500 hover:border-stone-300 hover:text-stone-700 transition-colors">yard
+                                → m</button>
+                            <button onclick="setQuick('length','mm','in')"
+                                class="bg-white border border-stone-200 rounded-full px-4 py-1.5 text-[12px] text-stone-500 hover:border-stone-300 hover:text-stone-700 transition-colors">mm
+                                → inch</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- mass -->
+                <div id="section-mass" class="section space-y-5">
+                    <p class="text-[11px] font-medium text-stone-400 tracking-widest uppercase">Mass</p>
+                    <div class="bg-white rounded-2xl border border-stone-200 p-6 space-y-5">
+                        <div class="flex items-end gap-4">
+                            <div class="flex-1 space-y-2">
+                                <label class="text-[12px] text-stone-400">From</label>
+                                <select id="mass-from"
+                                    class="w-full bg-stone-50 border border-stone-200 rounded-lg px-3 py-2.5 text-[14px] font-medium text-stone-700 focus:outline-none focus:border-stone-400">
+                                    <option value="t">Tonne (t)</option>
+                                    <option value="kg" selected>Kilogram (kg)</option>
+                                    <option value="g">Gram (g)</option>
+                                    <option value="mg">Milligram (mg)</option>
+                                    <option value="lb">Pound (lb)</option>
+                                    <option value="oz">Ounce (oz)</option>
+                                    <option value="st">Stone (st)</option>
+                                    <option value="ct">Carat (ct)</option>
+                                </select>
+                                <input id="mass-input" type="number" placeholder="Enter value" value="1"
+                                    class="w-full bg-stone-50 border border-stone-200 rounded-lg px-3 py-2.5 text-[22px] font-medium text-stone-700 focus:outline-none focus:border-stone-400" />
+                            </div>
+                            <button onclick="swapUnits('mass')"
+                                class="mb-2.5 w-10 h-10 rounded-full bg-stone-50 border border-stone-200 flex items-center justify-center text-stone-500 hover:bg-stone-100 transition-colors flex-shrink-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path d="M21 16H3m18 0-4 4m4-4-4-4M3 8h18M3 8l4 4M3 8l4-4" />
+                                </svg>
+                            </button>
+                            <div class="flex-1 space-y-2">
+                                <label class="text-[12px] text-stone-400">To</label>
+                                <select id="mass-to"
+                                    class="w-full bg-stone-50 border border-stone-200 rounded-lg px-3 py-2.5 text-[14px] font-medium text-stone-700 focus:outline-none focus:border-stone-400">
+                                    <option value="t">Tonne (t)</option>
+                                    <option value="kg">Kilogram (kg)</option>
+                                    <option value="g">Gram (g)</option>
+                                    <option value="mg">Milligram (mg)</option>
+                                    <option value="lb" selected>Pound (lb)</option>
+                                    <option value="oz">Ounce (oz)</option>
+                                    <option value="st">Stone (st)</option>
+                                    <option value="ct">Carat (ct)</option>
+                                </select>
+                                <div id="mass-result"
+                                    class="w-full bg-blue-50 border border-blue-100 rounded-lg px-3 py-2.5 text-[22px] font-medium text-blue-600 min-h-[50px]">
+                                    —</div>
+                            </div>
+                        </div>
+                        <div class="bg-stone-50 rounded-lg px-4 py-3 flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                                stroke-linejoin="round" class="text-stone-400 flex-shrink-0">
+                                <path d="M3 6h18M3 12h18M3 18h18" />
+                            </svg>
+                            <span class="text-[12px] text-stone-400">Formula: </span>
+                            <span id="mass-formula" class="text-[12px] font-mono text-stone-600">kg × 2.20462 =
+                                lb</span>
+                        </div>
+                        <button onclick="convert('mass')"
+                            class="w-full bg-stone-700 hover:bg-stone-600 text-white rounded-xl py-3.5 text-[15px] font-medium transition-colors">Convert</button>
+                    </div>
+                    <div class="space-y-2">
+                        <p class="text-[11px] font-medium text-stone-400 tracking-widest uppercase">Quick conversions
+                        </p>
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="setQuick('mass','kg','lb')"
+                                class="bg-white border border-stone-200 rounded-full px-4 py-1.5 text-[12px] text-stone-500 hover:border-stone-300 hover:text-stone-700 transition-colors">kg
+                                → lb</button>
+                            <button onclick="setQuick('mass','g','oz')"
+                                class="bg-white border border-stone-200 rounded-full px-4 py-1.5 text-[12px] text-stone-500 hover:border-stone-300 hover:text-stone-700 transition-colors">g
+                                → oz</button>
+                            <button onclick="setQuick('mass','lb','kg')"
+                                class="bg-white border border-stone-200 rounded-full px-4 py-1.5 text-[12px] text-stone-500 hover:border-stone-300 hover:text-stone-700 transition-colors">lb
+                                → kg</button>
+                            <button onclick="setQuick('mass','t','kg')"
+                                class="bg-white border border-stone-200 rounded-full px-4 py-1.5 text-[12px] text-stone-500 hover:border-stone-300 hover:text-stone-700 transition-colors">tonne
+                                → kg</button>
+                            <button onclick="setQuick('mass','st','kg')"
+                                class="bg-white border border-stone-200 rounded-full px-4 py-1.5 text-[12px] text-stone-500 hover:border-stone-300 hover:text-stone-700 transition-colors">stone
+                                → kg</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- volume -->
+                <div id="section-volume" class="section space-y-5">
+                    <p class="text-[11px] font-medium text-stone-400 tracking-widest uppercase">Volume</p>
+                    <div class="bg-white rounded-2xl border border-stone-200 p-6 space-y-5">
+                        <div class="flex items-end gap-4">
+                            <div class="flex-1 space-y-2">
+                                <label class="text-[12px] text-stone-400">From</label>
+                                <select id="volume-from"
+                                    class="w-full bg-stone-50 border border-stone-200 rounded-lg px-3 py-2.5 text-[14px] font-medium text-stone-700 focus:outline-none focus:border-stone-400">
+                                    <option value="l" selected>Litre (L)</option>
+                                    <option value="ml">Millilitre (mL)</option>
+                                    <option value="m3">Cubic metre (m³)</option>
+                                    <option value="cm3">Cubic centimetre (cm³)</option>
+                                    <option value="gal">Gallon (US gal)</option>
+                                    <option value="qt">Quart (qt)</option>
+                                    <option value="pt">Pint (pt)</option>
+                                    <option value="floz">Fluid ounce (fl oz)</option>
+                                    <option value="cup">Cup</option>
+                                    <option value="tbsp">Tablespoon (tbsp)</option>
+                                </select>
+                                <input id="volume-input" type="number" placeholder="Enter value" value="1"
+                                    class="w-full bg-stone-50 border border-stone-200 rounded-lg px-3 py-2.5 text-[22px] font-medium text-stone-700 focus:outline-none focus:border-stone-400" />
+                            </div>
+                            <button onclick="swapUnits('volume')"
+                                class="mb-2.5 w-10 h-10 rounded-full bg-stone-50 border border-stone-200 flex items-center justify-center text-stone-500 hover:bg-stone-100 transition-colors flex-shrink-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path d="M21 16H3m18 0-4 4m4-4-4-4M3 8h18M3 8l4 4M3 8l4-4" />
+                                </svg>
+                            </button>
+                            <div class="flex-1 space-y-2">
+                                <label class="text-[12px] text-stone-400">To</label>
+                                <select id="volume-to"
+                                    class="w-full bg-stone-50 border border-stone-200 rounded-lg px-3 py-2.5 text-[14px] font-medium text-stone-700 focus:outline-none focus:border-stone-400">
+                                    <option value="l">Litre (L)</option>
+                                    <option value="ml">Millilitre (mL)</option>
+                                    <option value="m3">Cubic metre (m³)</option>
+                                    <option value="cm3">Cubic centimetre (cm³)</option>
+                                    <option value="gal" selected>Gallon (US gal)</option>
+                                    <option value="qt">Quart (qt)</option>
+                                    <option value="pt">Pint (pt)</option>
+                                    <option value="floz">Fluid ounce (fl oz)</option>
+                                    <option value="cup">Cup</option>
+                                    <option value="tbsp">Tablespoon (tbsp)</option>
+                                </select>
+                                <div id="volume-result"
+                                    class="w-full bg-blue-50 border border-blue-100 rounded-lg px-3 py-2.5 text-[22px] font-medium text-blue-600 min-h-[50px]">
+                                    —</div>
+                            </div>
+                        </div>
+                        <div class="bg-stone-50 rounded-lg px-4 py-3 flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                                stroke-linejoin="round" class="text-stone-400 flex-shrink-0">
+                                <path d="M3 6h18M3 12h18M3 18h18" />
+                            </svg>
+                            <span class="text-[12px] text-stone-400">Formula: </span>
+                            <span id="volume-formula" class="text-[12px] font-mono text-stone-600">L × 0.264172 =
+                                gal</span>
+                        </div>
+                        <button onclick="convert('volume')"
+                            class="w-full bg-stone-700 hover:bg-stone-600 text-white rounded-xl py-3.5 text-[15px] font-medium transition-colors">Convert</button>
+                    </div>
+                    <div class="space-y-2">
+                        <p class="text-[11px] font-medium text-stone-400 tracking-widest uppercase">Quick conversions
+                        </p>
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="setQuick('volume','l','gal')"
+                                class="bg-white border border-stone-200 rounded-full px-4 py-1.5 text-[12px] text-stone-500 hover:border-stone-300 hover:text-stone-700 transition-colors">L
+                                → gallon</button>
+                            <button onclick="setQuick('volume','ml','floz')"
+                                class="bg-white border border-stone-200 rounded-full px-4 py-1.5 text-[12px] text-stone-500 hover:border-stone-300 hover:text-stone-700 transition-colors">mL
+                                → fl oz</button>
+                            <button onclick="setQuick('volume','cup','ml')"
+                                class="bg-white border border-stone-200 rounded-full px-4 py-1.5 text-[12px] text-stone-500 hover:border-stone-300 hover:text-stone-700 transition-colors">cup
+                                → mL</button>
+                            <button onclick="setQuick('volume','pt','l')"
+                                class="bg-white border border-stone-200 rounded-full px-4 py-1.5 text-[12px] text-stone-500 hover:border-stone-300 hover:text-stone-700 transition-colors">pint
+                                → L</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- temperature -->
+                <div id="section-temp" class="section space-y-5">
+                    <p class="text-[11px] font-medium text-stone-400 tracking-widest uppercase">Temperature</p>
+                    <div class="bg-white rounded-2xl border border-stone-200 p-6 space-y-5">
+                        <div class="flex items-end gap-4">
+                            <div class="flex-1 space-y-2">
+                                <label class="text-[12px] text-stone-400">From</label>
+                                <select id="temp-from"
+                                    class="w-full bg-stone-50 border border-stone-200 rounded-lg px-3 py-2.5 text-[14px] font-medium text-stone-700 focus:outline-none focus:border-stone-400">
+                                    <option value="c" selected>Celsius (°C)</option>
+                                    <option value="f">Fahrenheit (°F)</option>
+                                    <option value="k">Kelvin (K)</option>
+                                </select>
+                                <input id="temp-input" type="number" placeholder="Enter value" value="100"
+                                    class="w-full bg-stone-50 border border-stone-200 rounded-lg px-3 py-2.5 text-[22px] font-medium text-stone-700 focus:outline-none focus:border-stone-400" />
+                            </div>
+                            <button onclick="swapUnits('temp')"
+                                class="mb-2.5 w-10 h-10 rounded-full bg-stone-50 border border-stone-200 flex items-center justify-center text-stone-500 hover:bg-stone-100 transition-colors flex-shrink-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path d="M21 16H3m18 0-4 4m4-4-4-4M3 8h18M3 8l4 4M3 8l4-4" />
+                                </svg>
+                            </button>
+                            <div class="flex-1 space-y-2">
+                                <label class="text-[12px] text-stone-400">To</label>
+                                <select id="temp-to"
+                                    class="w-full bg-stone-50 border border-stone-200 rounded-lg px-3 py-2.5 text-[14px] font-medium text-stone-700 focus:outline-none focus:border-stone-400">
+                                    <option value="c">Celsius (°C)</option>
+                                    <option value="f" selected>Fahrenheit (°F)</option>
+                                    <option value="k">Kelvin (K)</option>
+                                </select>
+                                <div id="temp-result"
+                                    class="w-full bg-blue-50 border border-blue-100 rounded-lg px-3 py-2.5 text-[22px] font-medium text-blue-600 min-h-[50px]">
+                                    —</div>
+                            </div>
+                        </div>
+                        <div class="bg-stone-50 rounded-lg px-4 py-3 flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                                stroke-linejoin="round" class="text-stone-400 flex-shrink-0">
+                                <path d="M3 6h18M3 12h18M3 18h18" />
+                            </svg>
+                            <span class="text-[12px] text-stone-400">Formula: </span>
+                            <span id="temp-formula" class="text-[12px] font-mono text-stone-600">(°C × 9/5) + 32 =
+                                °F</span>
+                        </div>
+                        <button onclick="convert('temp')"
+                            class="w-full bg-stone-700 hover:bg-stone-600 text-white rounded-xl py-3.5 text-[15px] font-medium transition-colors">Convert</button>
+                    </div>
+                    <div class="space-y-2">
+                        <p class="text-[11px] font-medium text-stone-400 tracking-widest uppercase">Quick conversions
+                        </p>
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="setQuick('temp','c','f')"
+                                class="bg-white border border-stone-200 rounded-full px-4 py-1.5 text-[12px] text-stone-500 hover:border-stone-300 hover:text-stone-700 transition-colors">°C
+                                → °F</button>
+                            <button onclick="setQuick('temp','f','c')"
+                                class="bg-white border border-stone-200 rounded-full px-4 py-1.5 text-[12px] text-stone-500 hover:border-stone-300 hover:text-stone-700 transition-colors">°F
+                                → °C</button>
+                            <button onclick="setQuick('temp','c','k')"
+                                class="bg-white border border-stone-200 rounded-full px-4 py-1.5 text-[12px] text-stone-500 hover:border-stone-300 hover:text-stone-700 transition-colors">°C
+                                → K</button>
+                            <button onclick="setQuick('temp','k','f')"
+                                class="bg-white border border-stone-200 rounded-full px-4 py-1.5 text-[12px] text-stone-500 hover:border-stone-300 hover:text-stone-700 transition-colors">K
+                                → °F</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- time -->
+                <div id="section-time" class="section space-y-5">
+                    <p class="text-[11px] font-medium text-stone-400 tracking-widest uppercase">Time</p>
+                    <div class="bg-white rounded-2xl border border-stone-200 p-6 space-y-5">
+                        <div class="flex items-end gap-4">
+                            <div class="flex-1 space-y-2">
+                                <label class="text-[12px] text-stone-400">From</label>
+                                <select id="time-from"
+                                    class="w-full bg-stone-50 border border-stone-200 rounded-lg px-3 py-2.5 text-[14px] font-medium text-stone-700 focus:outline-none focus:border-stone-400">
+                                    <option value="yr">Year (yr)</option>
+                                    <option value="mo">Month (mo)</option>
+                                    <option value="wk">Week (wk)</option>
+                                    <option value="d">Day (d)</option>
+                                    <option value="hr" selected>Hour (hr)</option>
+                                    <option value="min">Minute (min)</option>
+                                    <option value="s">Second (s)</option>
+                                    <option value="ms">Millisecond (ms)</option>
+                                </select>
+                                <input id="time-input" type="number" placeholder="Enter value" value="1"
+                                    class="w-full bg-stone-50 border border-stone-200 rounded-lg px-3 py-2.5 text-[22px] font-medium text-stone-700 focus:outline-none focus:border-stone-400" />
+                            </div>
+                            <button onclick="swapUnits('time')"
+                                class="mb-2.5 w-10 h-10 rounded-full bg-stone-50 border border-stone-200 flex items-center justify-center text-stone-500 hover:bg-stone-100 transition-colors flex-shrink-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path d="M21 16H3m18 0-4 4m4-4-4-4M3 8h18M3 8l4 4M3 8l4-4" />
+                                </svg>
+                            </button>
+                            <div class="flex-1 space-y-2">
+                                <label class="text-[12px] text-stone-400">To</label>
+                                <select id="time-to"
+                                    class="w-full bg-stone-50 border border-stone-200 rounded-lg px-3 py-2.5 text-[14px] font-medium text-stone-700 focus:outline-none focus:border-stone-400">
+                                    <option value="yr">Year (yr)</option>
+                                    <option value="mo">Month (mo)</option>
+                                    <option value="wk">Week (wk)</option>
+                                    <option value="d">Day (d)</option>
+                                    <option value="hr">Hour (hr)</option>
+                                    <option value="min" selected>Minute (min)</option>
+                                    <option value="s">Second (s)</option>
+                                    <option value="ms">Millisecond (ms)</option>
+                                </select>
+                                <div id="time-result"
+                                    class="w-full bg-blue-50 border border-blue-100 rounded-lg px-3 py-2.5 text-[22px] font-medium text-blue-600 min-h-[50px]">
+                                    —</div>
+                            </div>
+                        </div>
+                        <div class="bg-stone-50 rounded-lg px-4 py-3 flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                                stroke-linejoin="round" class="text-stone-400 flex-shrink-0">
+                                <path d="M3 6h18M3 12h18M3 18h18" />
+                            </svg>
+                            <span class="text-[12px] text-stone-400">Formula: </span>
+                            <span id="time-formula" class="text-[12px] font-mono text-stone-600">hr × 60 = min</span>
+                        </div>
+                        <button onclick="convert('time')"
+                            class="w-full bg-stone-700 hover:bg-stone-600 text-white rounded-xl py-3.5 text-[15px] font-medium transition-colors">Convert</button>
+                    </div>
+                    <div class="space-y-2">
+                        <p class="text-[11px] font-medium text-stone-400 tracking-widest uppercase">Quick conversions
+                        </p>
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="setQuick('time','hr','min')"
+                                class="bg-white border border-stone-200 rounded-full px-4 py-1.5 text-[12px] text-stone-500 hover:border-stone-300 hover:text-stone-700 transition-colors">hr
+                                → min</button>
+                            <button onclick="setQuick('time','d','hr')"
+                                class="bg-white border border-stone-200 rounded-full px-4 py-1.5 text-[12px] text-stone-500 hover:border-stone-300 hover:text-stone-700 transition-colors">day
+                                → hr</button>
+                            <button onclick="setQuick('time','yr','d')"
+                                class="bg-white border border-stone-200 rounded-full px-4 py-1.5 text-[12px] text-stone-500 hover:border-stone-300 hover:text-stone-700 transition-colors">year
+                                → day</button>
+                            <button onclick="setQuick('time','min','s')"
+                                class="bg-white border border-stone-200 rounded-full px-4 py-1.5 text-[12px] text-stone-500 hover:border-stone-300 hover:text-stone-700 transition-colors">min
+                                → sec</button>
+                            <button onclick="setQuick('time','wk','d')"
+                                class="bg-white border border-stone-200 rounded-full px-4 py-1.5 text-[12px] text-stone-500 hover:border-stone-300 hover:text-stone-700 transition-colors">week
+                                → day</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- area -->
+                <div id="section-area" class="section space-y-5">
+                    <p class="text-[11px] font-medium text-stone-400 tracking-widest uppercase">Area</p>
+                    <div class="bg-white rounded-2xl border border-stone-200 p-6 space-y-5">
+                        <div class="flex items-end gap-4">
+                            <div class="flex-1 space-y-2">
+                                <label class="text-[12px] text-stone-400">From</label>
+                                <select id="area-from"
+                                    class="w-full bg-stone-50 border border-stone-200 rounded-lg px-3 py-2.5 text-[14px] font-medium text-stone-700 focus:outline-none focus:border-stone-400">
+                                    <option value="km2">Square kilometre (km²)</option>
+                                    <option value="m2" selected>Square metre (m²)</option>
+                                    <option value="cm2">Square centimetre (cm²)</option>
+                                    <option value="mm2">Square millimetre (mm²)</option>
+                                    <option value="ha">Hectare (ha)</option>
+                                    <option value="ac">Acre (ac)</option>
+                                    <option value="mi2">Square mile (mi²)</option>
+                                    <option value="yd2">Square yard (yd²)</option>
+                                    <option value="ft2">Square foot (ft²)</option>
+                                </select>
+                                <input id="area-input" type="number" placeholder="Enter value" value="1"
+                                    class="w-full bg-stone-50 border border-stone-200 rounded-lg px-3 py-2.5 text-[22px] font-medium text-stone-700 focus:outline-none focus:border-stone-400" />
+                            </div>
+                            <button onclick="swapUnits('area')"
+                                class="mb-2.5 w-10 h-10 rounded-full bg-stone-50 border border-stone-200 flex items-center justify-center text-stone-500 hover:bg-stone-100 transition-colors flex-shrink-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path d="M21 16H3m18 0-4 4m4-4-4-4M3 8h18M3 8l4 4M3 8l4-4" />
+                                </svg>
+                            </button>
+                            <div class="flex-1 space-y-2">
+                                <label class="text-[12px] text-stone-400">To</label>
+                                <select id="area-to"
+                                    class="w-full bg-stone-50 border border-stone-200 rounded-lg px-3 py-2.5 text-[14px] font-medium text-stone-700 focus:outline-none focus:border-stone-400">
+                                    <option value="km2">Square kilometre (km²)</option>
+                                    <option value="m2">Square metre (m²)</option>
+                                    <option value="cm2">Square centimetre (cm²)</option>
+                                    <option value="mm2">Square millimetre (mm²)</option>
+                                    <option value="ha">Hectare (ha)</option>
+                                    <option value="ac" selected>Acre (ac)</option>
+                                    <option value="mi2">Square mile (mi²)</option>
+                                    <option value="yd2">Square yard (yd²)</option>
+                                    <option value="ft2">Square foot (ft²)</option>
+                                </select>
+                                <div id="area-result"
+                                    class="w-full bg-blue-50 border border-blue-100 rounded-lg px-3 py-2.5 text-[22px] font-medium text-blue-600 min-h-[50px]">
+                                    —</div>
+                            </div>
+                        </div>
+                        <div class="bg-stone-50 rounded-lg px-4 py-3 flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                                stroke-linejoin="round" class="text-stone-400 flex-shrink-0">
+                                <path d="M3 6h18M3 12h18M3 18h18" />
+                            </svg>
+                            <span class="text-[12px] text-stone-400">Formula: </span>
+                            <span id="area-formula" class="text-[12px] font-mono text-stone-600">m² × 0.000247 =
+                                ac</span>
+                        </div>
+                        <button onclick="convert('area')"
+                            class="w-full bg-stone-700 hover:bg-stone-600 text-white rounded-xl py-3.5 text-[15px] font-medium transition-colors">Convert</button>
+                    </div>
+                    <div class="space-y-2">
+                        <p class="text-[11px] font-medium text-stone-400 tracking-widest uppercase">Quick conversions
+                        </p>
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="setQuick('area','m2','ft2')"
+                                class="bg-white border border-stone-200 rounded-full px-4 py-1.5 text-[12px] text-stone-500 hover:border-stone-300 hover:text-stone-700 transition-colors">m²
+                                → ft²</button>
+                            <button onclick="setQuick('area','ha','ac')"
+                                class="bg-white border border-stone-200 rounded-full px-4 py-1.5 text-[12px] text-stone-500 hover:border-stone-300 hover:text-stone-700 transition-colors">ha
+                                → acre</button>
+                            <button onclick="setQuick('area','km2','mi2')"
+                                class="bg-white border border-stone-200 rounded-full px-4 py-1.5 text-[12px] text-stone-500 hover:border-stone-300 hover:text-stone-700 transition-colors">km²
+                                → mi²</button>
+                            <button onclick="setQuick('area','ac','m2')"
+                                class="bg-white border border-stone-200 rounded-full px-4 py-1.5 text-[12px] text-stone-500 hover:border-stone-300 hover:text-stone-700 transition-colors">acre
+                                → m²</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- speed -->
+                <div id="section-speed" class="section space-y-5">
+                    <p class="text-[11px] font-medium text-stone-400 tracking-widest uppercase">Speed</p>
+                    <div class="bg-white rounded-2xl border border-stone-200 p-6 space-y-5">
+                        <div class="flex items-end gap-4">
+                            <div class="flex-1 space-y-2">
+                                <label class="text-[12px] text-stone-400">From</label>
+                                <select id="speed-from"
+                                    class="w-full bg-stone-50 border border-stone-200 rounded-lg px-3 py-2.5 text-[14px] font-medium text-stone-700 focus:outline-none focus:border-stone-400">
+                                    <option value="kmh" selected>km/h</option>
+                                    <option value="ms">m/s</option>
+                                    <option value="mph">mph</option>
+                                    <option value="kn">Knot (kn)</option>
+                                    <option value="fts">ft/s</option>
+                                </select>
+                                <input id="speed-input" type="number" placeholder="Enter value" value="100"
+                                    class="w-full bg-stone-50 border border-stone-200 rounded-lg px-3 py-2.5 text-[22px] font-medium text-stone-700 focus:outline-none focus:border-stone-400" />
+                            </div>
+                            <button onclick="swapUnits('speed')"
+                                class="mb-2.5 w-10 h-10 rounded-full bg-stone-50 border border-stone-200 flex items-center justify-center text-stone-500 hover:bg-stone-100 transition-colors flex-shrink-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path d="M21 16H3m18 0-4 4m4-4-4-4M3 8h18M3 8l4 4M3 8l4-4" />
+                                </svg>
+                            </button>
+                            <div class="flex-1 space-y-2">
+                                <label class="text-[12px] text-stone-400">To</label>
+                                <select id="speed-to"
+                                    class="w-full bg-stone-50 border border-stone-200 rounded-lg px-3 py-2.5 text-[14px] font-medium text-stone-700 focus:outline-none focus:border-stone-400">
+                                    <option value="kmh">km/h</option>
+                                    <option value="ms">m/s</option>
+                                    <option value="mph" selected>mph</option>
+                                    <option value="kn">Knot (kn)</option>
+                                    <option value="fts">ft/s</option>
+                                </select>
+                                <div id="speed-result"
+                                    class="w-full bg-blue-50 border border-blue-100 rounded-lg px-3 py-2.5 text-[22px] font-medium text-blue-600 min-h-[50px]">
+                                    —</div>
+                            </div>
+                        </div>
+                        <div class="bg-stone-50 rounded-lg px-4 py-3 flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                                stroke-linejoin="round" class="text-stone-400 flex-shrink-0">
+                                <path d="M3 6h18M3 12h18M3 18h18" />
+                            </svg>
+                            <span class="text-[12px] text-stone-400">Formula: </span>
+                            <span id="speed-formula" class="text-[12px] font-mono text-stone-600">km/h × 0.621371 =
+                                mph</span>
+                        </div>
+                        <button onclick="convert('speed')"
+                            class="w-full bg-stone-700 hover:bg-stone-600 text-white rounded-xl py-3.5 text-[15px] font-medium transition-colors">Convert</button>
+                    </div>
+                    <div class="space-y-2">
+                        <p class="text-[11px] font-medium text-stone-400 tracking-widest uppercase">Quick conversions
+                        </p>
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="setQuick('speed','kmh','mph')"
+                                class="bg-white border border-stone-200 rounded-full px-4 py-1.5 text-[12px] text-stone-500 hover:border-stone-300 hover:text-stone-700 transition-colors">km/h
+                                → mph</button>
+                            <button onclick="setQuick('speed','ms','kmh')"
+                                class="bg-white border border-stone-200 rounded-full px-4 py-1.5 text-[12px] text-stone-500 hover:border-stone-300 hover:text-stone-700 transition-colors">m/s
+                                → km/h</button>
+                            <button onclick="setQuick('speed','mph','kn')"
+                                class="bg-white border border-stone-200 rounded-full px-4 py-1.5 text-[12px] text-stone-500 hover:border-stone-300 hover:text-stone-700 transition-colors">mph
+                                → knot</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- data storage -->
+                <div id="section-data" class="section space-y-5">
+                    <p class="text-[11px] font-medium text-stone-400 tracking-widest uppercase">Data storage</p>
+                    <div class="bg-white rounded-2xl border border-stone-200 p-6 space-y-5">
+                        <div class="flex items-end gap-4">
+                            <div class="flex-1 space-y-2">
+                                <label class="text-[12px] text-stone-400">From</label>
+                                <select id="data-from"
+                                    class="w-full bg-stone-50 border border-stone-200 rounded-lg px-3 py-2.5 text-[14px] font-medium text-stone-700 focus:outline-none focus:border-stone-400">
+                                    <option value="bit">Bit</option>
+                                    <option value="b">Byte (B)</option>
+                                    <option value="kb">Kilobyte (KB)</option>
+                                    <option value="mb" selected>Megabyte (MB)</option>
+                                    <option value="gb">Gigabyte (GB)</option>
+                                    <option value="tb">Terabyte (TB)</option>
+                                    <option value="pb">Petabyte (PB)</option>
+                                </select>
+                                <input id="data-input" type="number" placeholder="Enter value" value="1"
+                                    class="w-full bg-stone-50 border border-stone-200 rounded-lg px-3 py-2.5 text-[22px] font-medium text-stone-700 focus:outline-none focus:border-stone-400" />
+                            </div>
+                            <button onclick="swapUnits('data')"
+                                class="mb-2.5 w-10 h-10 rounded-full bg-stone-50 border border-stone-200 flex items-center justify-center text-stone-500 hover:bg-stone-100 transition-colors flex-shrink-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path d="M21 16H3m18 0-4 4m4-4-4-4M3 8h18M3 8l4 4M3 8l4-4" />
+                                </svg>
+                            </button>
+                            <div class="flex-1 space-y-2">
+                                <label class="text-[12px] text-stone-400">To</label>
+                                <select id="data-to"
+                                    class="w-full bg-stone-50 border border-stone-200 rounded-lg px-3 py-2.5 text-[14px] font-medium text-stone-700 focus:outline-none focus:border-stone-400">
+                                    <option value="bit">Bit</option>
+                                    <option value="b">Byte (B)</option>
+                                    <option value="kb">Kilobyte (KB)</option>
+                                    <option value="mb">Megabyte (MB)</option>
+                                    <option value="gb" selected>Gigabyte (GB)</option>
+                                    <option value="tb">Terabyte (TB)</option>
+                                    <option value="pb">Petabyte (PB)</option>
+                                </select>
+                                <div id="data-result"
+                                    class="w-full bg-blue-50 border border-blue-100 rounded-lg px-3 py-2.5 text-[22px] font-medium text-blue-600 min-h-[50px]">
+                                    —</div>
+                            </div>
+                        </div>
+                        <div class="bg-stone-50 rounded-lg px-4 py-3 flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                                stroke-linejoin="round" class="text-stone-400 flex-shrink-0">
+                                <path d="M3 6h18M3 12h18M3 18h18" />
+                            </svg>
+                            <span class="text-[12px] text-stone-400">Formula: </span>
+                            <span id="data-formula" class="text-[12px] font-mono text-stone-600">MB ÷ 1024 = GB</span>
+                        </div>
+                        <button onclick="convert('data')"
+                            class="w-full bg-stone-700 hover:bg-stone-600 text-white rounded-xl py-3.5 text-[15px] font-medium transition-colors">Convert</button>
+                    </div>
+                    <div class="space-y-2">
+                        <p class="text-[11px] font-medium text-stone-400 tracking-widest uppercase">Quick conversions
+                        </p>
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="setQuick('data','mb','gb')"
+                                class="bg-white border border-stone-200 rounded-full px-4 py-1.5 text-[12px] text-stone-500 hover:border-stone-300 hover:text-stone-700 transition-colors">MB
+                                → GB</button>
+                            <button onclick="setQuick('data','gb','tb')"
+                                class="bg-white border border-stone-200 rounded-full px-4 py-1.5 text-[12px] text-stone-500 hover:border-stone-300 hover:text-stone-700 transition-colors">GB
+                                → TB</button>
+                            <button onclick="setQuick('data','kb','mb')"
+                                class="bg-white border border-stone-200 rounded-full px-4 py-1.5 text-[12px] text-stone-500 hover:border-stone-300 hover:text-stone-700 transition-colors">KB
+                                → MB</button>
+                            <button onclick="setQuick('data','b','kb')"
+                                class="bg-white border border-stone-200 rounded-full px-4 py-1.5 text-[12px] text-stone-500 hover:border-stone-300 hover:text-stone-700 transition-colors">B
+                                → KB</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- energy -->
+                <div id="section-energy" class="section space-y-5">
+                    <p class="text-[11px] font-medium text-stone-400 tracking-widest uppercase">Energy</p>
+                    <div class="bg-white rounded-2xl border border-stone-200 p-6 space-y-5">
+                        <div class="flex items-end gap-4">
+                            <div class="flex-1 space-y-2">
+                                <label class="text-[12px] text-stone-400">From</label>
+                                <select id="energy-from"
+                                    class="w-full bg-stone-50 border border-stone-200 rounded-lg px-3 py-2.5 text-[14px] font-medium text-stone-700 focus:outline-none focus:border-stone-400">
+                                    <option value="j" selected>Joule (J)</option>
+                                    <option value="kj">Kilojoule (kJ)</option>
+                                    <option value="cal">Calorie (cal)</option>
+                                    <option value="kcal">Kilocalorie (kcal)</option>
+                                    <option value="kwh">Kilowatt-hour (kWh)</option>
+                                    <option value="btu">BTU</option>
+                                    <option value="ev">Electron-volt (eV)</option>
+                                </select>
+                                <input id="energy-input" type="number" placeholder="Enter value" value="1000"
+                                    class="w-full bg-stone-50 border border-stone-200 rounded-lg px-3 py-2.5 text-[22px] font-medium text-stone-700 focus:outline-none focus:border-stone-400" />
+                            </div>
+                            <button onclick="swapUnits('energy')"
+                                class="mb-2.5 w-10 h-10 rounded-full bg-stone-50 border border-stone-200 flex items-center justify-center text-stone-500 hover:bg-stone-100 transition-colors flex-shrink-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path d="M21 16H3m18 0-4 4m4-4-4-4M3 8h18M3 8l4 4M3 8l4-4" />
+                                </svg>
+                            </button>
+                            <div class="flex-1 space-y-2">
+                                <label class="text-[12px] text-stone-400">To</label>
+                                <select id="energy-to"
+                                    class="w-full bg-stone-50 border border-stone-200 rounded-lg px-3 py-2.5 text-[14px] font-medium text-stone-700 focus:outline-none focus:border-stone-400">
+                                    <option value="j">Joule (J)</option>
+                                    <option value="kj">Kilojoule (kJ)</option>
+                                    <option value="cal" selected>Calorie (cal)</option>
+                                    <option value="kcal">Kilocalorie (kcal)</option>
+                                    <option value="kwh">Kilowatt-hour (kWh)</option>
+                                    <option value="btu">BTU</option>
+                                    <option value="ev">Electron-volt (eV)</option>
+                                </select>
+                                <div id="energy-result"
+                                    class="w-full bg-blue-50 border border-blue-100 rounded-lg px-3 py-2.5 text-[22px] font-medium text-blue-600 min-h-[50px]">
+                                    —</div>
+                            </div>
+                        </div>
+                        <div class="bg-stone-50 rounded-lg px-4 py-3 flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                                stroke-linejoin="round" class="text-stone-400 flex-shrink-0">
+                                <path d="M3 6h18M3 12h18M3 18h18" />
+                            </svg>
+                            <span class="text-[12px] text-stone-400">Formula: </span>
+                            <span id="energy-formula" class="text-[12px] font-mono text-stone-600">J × 0.239006 =
+                                cal</span>
+                        </div>
+                        <button onclick="convert('energy')"
+                            class="w-full bg-stone-700 hover:bg-stone-600 text-white rounded-xl py-3.5 text-[15px] font-medium transition-colors">Convert</button>
+                    </div>
+                    <div class="space-y-2">
+                        <p class="text-[11px] font-medium text-stone-400 tracking-widest uppercase">Quick conversions
+                        </p>
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="setQuick('energy','kcal','j')"
+                                class="bg-white border border-stone-200 rounded-full px-4 py-1.5 text-[12px] text-stone-500 hover:border-stone-300 hover:text-stone-700 transition-colors">kcal
+                                → J</button>
+                            <button onclick="setQuick('energy','kwh','kj')"
+                                class="bg-white border border-stone-200 rounded-full px-4 py-1.5 text-[12px] text-stone-500 hover:border-stone-300 hover:text-stone-700 transition-colors">kWh
+                                → kJ</button>
+                            <button onclick="setQuick('energy','j','btu')"
+                                class="bg-white border border-stone-200 rounded-full px-4 py-1.5 text-[12px] text-stone-500 hover:border-stone-300 hover:text-stone-700 transition-colors">J
+                                → BTU</button>
+                            <button onclick="setQuick('energy','cal','j')"
+                                class="bg-white border border-stone-200 rounded-full px-4 py-1.5 text-[12px] text-stone-500 hover:border-stone-300 hover:text-stone-700 transition-colors">cal
+                                → J</button>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <script>
+        function scrollTabs(dir) {
+            const el = document.getElementById('tab-scroll');
+            el.scrollBy({ left: dir * 120, behavior: 'smooth' });
+            setTimeout(updateArrows, 320);
+        }
+
+        function updateArrows() {
+            const el = document.getElementById('tab-scroll');
+            document.getElementById('tab-prev').style.opacity = el.scrollLeft <= 0 ? '0.25' : '1';
+            document.getElementById('tab-next').style.opacity = el.scrollLeft + el.clientWidth >= el.scrollWidth - 1 ? '0.25' : '1';
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('tab-scroll').addEventListener('scroll', updateArrows);
+            updateArrows();
+        });
+
+        const tabs = ['length', 'mass', 'volume', 'temp', 'time', 'area', 'speed', 'data', 'energy'];
+
+        function switchTab(name) {
+            tabs.forEach(t => {
+                document.getElementById('tab-' + t).className =
+                    (t === name ? 'tab-active' : 'tab-inactive') + ' tab px-4 h-11 text-[13px] whitespace-nowrap transition-colors';
+                document.getElementById('section-' + t).classList.toggle('active', t === name);
+            });
+            document.getElementById('tab-' + name).scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+            setTimeout(updateArrows, 320);
+        }
+
+        function swapUnits(category) {
+            const fromEl = document.getElementById(category + '-from');
+            const toEl = document.getElementById(category + '-to');
+            const tmp = fromEl.value;
+            fromEl.value = toEl.value;
+            toEl.value = tmp;
+        }
+
+        function setQuick(category, from, to) {
+            document.getElementById(category + '-from').value = from;
+            document.getElementById(category + '-to').value = to;
+        }
+
+        // conversion rates
+        const rates = {
+            length: { km: 1000, m: 1, cm: 0.01, mm: 0.001, mi: 1609.344, yd: 0.9144, ft: 0.3048, in: 0.0254, nmi: 1852 },
+            mass: { t: 1000, kg: 1, g: 0.001, mg: 0.000001, lb: 0.45359237, oz: 0.028349523, st: 6.35029318, ct: 0.0002 },
+            volume: { l: 1, ml: 0.001, m3: 1000, cm3: 0.001, gal: 3.785411784, qt: 0.946352946, pt: 0.473176473, floz: 0.029573529, cup: 0.236588237, tbsp: 0.014786765 },
+            time: { yr: 31557600, mo: 2629800, wk: 604800, d: 86400, hr: 3600, min: 60, s: 1, ms: 0.001 },
+            area: { km2: 1e6, m2: 1, cm2: 0.0001, mm2: 1e-6, ha: 10000, ac: 4046.8564224, mi2: 2589988.110336, yd2: 0.83612736, ft2: 0.09290304 },
+            speed: { kmh: 1, ms: 3.6, mph: 1.60934, kn: 1.852, fts: 1.09728 },
+            data: { bit: 0.125, b: 1, kb: 1024, mb: 1048576, gb: 1073741824, tb: 1099511627776, pb: 1125899906842624 },
+            energy: { j: 1, kj: 1000, cal: 4.184, kcal: 4184, kwh: 3600000, btu: 1055.05585, ev: 1.602176634e-19 },
+        };
+
+        // labels
+        const labels = {
+            length: { km: 'km', m: 'm', cm: 'cm', mm: 'mm', mi: 'mi', yd: 'yd', ft: 'ft', in: 'in', nmi: 'nmi' },
+            mass: { t: 't', kg: 'kg', g: 'g', mg: 'mg', lb: 'lb', oz: 'oz', st: 'st', ct: 'ct' },
+            volume: { l: 'L', ml: 'mL', m3: 'm³', cm3: 'cm³', gal: 'gal', qt: 'qt', pt: 'pt', floz: 'fl oz', cup: 'cup', tbsp: 'tbsp' },
+            time: { yr: 'yr', mo: 'mo', wk: 'wk', d: 'd', hr: 'hr', min: 'min', s: 's', ms: 'ms' },
+            area: { km2: 'km²', m2: 'm²', cm2: 'cm²', mm2: 'mm²', ha: 'ha', ac: 'ac', mi2: 'mi²', yd2: 'yd²', ft2: 'ft²' },
+            speed: { kmh: 'km/h', ms: 'm/s', mph: 'mph', kn: 'kn', fts: 'ft/s' },
+            data: { bit: 'bit', b: 'B', kb: 'KB', mb: 'MB', gb: 'GB', tb: 'TB', pb: 'PB' },
+            energy: { j: 'J', kj: 'kJ', cal: 'cal', kcal: 'kcal', kwh: 'kWh', btu: 'BTU', ev: 'eV' },
+        };
+
+        // format result
+        function formatResult(n) {
+            if (!isFinite(n)) return 'Error';
+            if (n === 0) return '0';
+            const abs = Math.abs(n);
+            if (abs >= 1e15 || (abs < 1e-6 && abs > 0)) return n.toExponential(4);
+            if (abs >= 1000) return parseFloat(n.toPrecision(8)).toLocaleString();
+            return parseFloat(n.toPrecision(8)).toString();
+        }
+
+        // temperature special calculation
+        function convertTemp(value, from, to) {
+            if (from === to) return value;
+            let celsius;
+            switch (from) {
+                case 'c': celsius = value; break;
+                case 'f': celsius = (value - 32) * 5 / 9; break;
+                case 'k': celsius = value - 273.15; break;
+            }
+            switch (to) {
+                case 'c': return celsius;
+                case 'f': return celsius * 9 / 5 + 32;
+                case 'k': return celsius + 273.15;
+            }
+        }
+
+        // ─formula strings
+        function getFormula(category, from, to, value, result) {
+            const fl = labels[category] ? labels[category][from] : from;
+            const tl = labels[category] ? labels[category][to] : to;
+            if (category === 'temp') {
+                const formulaMap = {
+                    'c-f': '(°C × 9/5) + 32 = °F',
+                    'f-c': '(°F − 32) × 5/9 = °C',
+                    'c-k': '°C + 273.15 = K',
+                    'k-c': 'K − 273.15 = °C',
+                    'f-k': '(°F − 32) × 5/9 + 273.15 = K',
+                    'k-f': '(K − 273.15) × 9/5 + 32 = °F',
+                };
+                return formulaMap[from + '-' + to] || `${fl} → ${tl}`;
+            }
+            const ratio = rates[category][to] / rates[category][from];
+            const ratioStr = parseFloat(ratio.toPrecision(6)).toString();
+            if (ratio >= 1) return `${fl} × ${ratioStr} = ${tl}`;
+            return `${fl} ÷ ${parseFloat((1 / ratio).toPrecision(6))} = ${tl}`;
+        }
+
+        // convert function
+        function convert(category) {
+            const value = parseFloat(document.getElementById(category + '-input').value);
+            const from = document.getElementById(category + '-from').value;
+            const to = document.getElementById(category + '-to').value;
+            const resultEl = document.getElementById(category + '-result');
+            const formulaEl = document.getElementById(category + '-formula');
+
+            if (isNaN(value)) { resultEl.textContent = '—'; return; }
+
+            let result;
+            if (category === 'temp') {
+                result = convertTemp(value, from, to);
+            } else {
+                const toBase = value * rates[category][from];
+                result = toBase / rates[category][to];
+            }
+
+            resultEl.textContent = formatResult(result);
+            formulaEl.textContent = getFormula(category, from, to, value, result);
+        }
+    </script>
+</body>
+
+</html>
