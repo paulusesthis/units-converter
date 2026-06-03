@@ -13,6 +13,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap"
         rel="stylesheet" />
+    <script src="https://kit.fontawesome.com/09dda602fe.js" crossorigin="anonymous"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -86,19 +87,13 @@
                     <span class="text-[15px] font-medium text-stone-700">Units converter</span>
                     <button onclick="toggleHistory()"
                         class="text-[13px] text-stone-400 flex items-center gap-1.5 hover:text-stone-600 transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M3 3h18v4H3z" />
-                            <path d="M5 7v13" />
-                            <path d="M19 7v13" />
-                            <path d="M9 12h6" />
-                        </svg>
+                        <i class="fa-solid fa-clock-rotate-left"></i>
                         History
                     </button>
                 </div>
             </header>
 
-            <!-- history drawer -->
+            <!-- history  drawer -->
             <div id="history-drawer" class="hidden border-b border-stone-200 bg-white">
                 <div class="px-6 py-4 flex items-center justify-between">
                     <span class="text-[13px] font-medium text-stone-600">Recent conversions</span>
@@ -111,14 +106,13 @@
                 <div id="history-empty" class="px-6 pb-5 text-[13px] text-stone-400 text-center hidden">No conversions
                     yet</div>
             </div>
+
+            <!-- tabs -->
             <div class="bg-white border-b border-stone-200 flex items-center">
                 <button id="tab-prev" onclick="scrollTabs(-1)"
                     class="flex-shrink-0 w-9 h-11 flex items-center justify-center text-stone-400 hover:text-stone-600 hover:bg-stone-50 transition-colors border-r border-stone-100 disabled:opacity-25"
                     aria-label="Scroll tabs left">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M15 18l-6-6 6-6" />
-                    </svg>
+                    <i class="fa-solid fa-angle-left"></i>
                 </button>
                 <div id="tab-scroll" class="flex-1 overflow-x-auto flex"
                     style="scrollbar-width:none;-ms-overflow-style:none;">
@@ -128,7 +122,7 @@
                         }
                     </style>
                     <button onclick="switchTab('length')" id="tab-length"
-                        class="tab-active   tab px-4 h-11 text-[13px] whitespace-nowrap transition-colors">Length</button>
+                        class="tab-active tab px-4 h-11 text-[13px] whitespace-nowrap transition-colors">Length</button>
                     <button onclick="switchTab('mass')" id="tab-mass"
                         class="tab-inactive tab px-4 h-11 text-[13px] whitespace-nowrap transition-colors">Mass</button>
                     <button onclick="switchTab('volume')" id="tab-volume"
@@ -150,10 +144,7 @@
                 <button id="tab-next" onclick="scrollTabs(1)"
                     class="flex-shrink-0 w-9 h-11 flex items-center justify-center text-stone-400 hover:text-stone-600 hover:bg-stone-50 transition-colors border-l border-stone-100"
                     aria-label="Scroll tabs right">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M9 18l6-6-6-6" />
-                    </svg>
+                    <i class="fa-solid fa-angle-right"></i>
                 </button>
             </div>
 
